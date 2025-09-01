@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task List</title>
+  <style>
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: space-between;
+    }
+    .actions a {
+      margin-left: 10px;
+      text-decoration: none;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>📝 Task List</h1>
+    <% if (user) { %>
+      <div>
+        👤 <%= user.email %> |
+        <a href="/logout">Logout</a>
+      </div>
+    <% } else { %>
+      <div>
+        <a href="/login">Login</a> |
+        <a href="/signup">Signup</a>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Task form -->
+  <% if (user) { %>
+    <form method="POST" action="<%= editing ? '/data/' + editing.id : '/data' %>">
+      <input type="text" name="todo" placeholder="Enter task..." 
+        value="<%= editing ? editing.tasks : '' %>" required />
+      <button type="submit">
+        <%= editing ? "✏️ Update Task" : "➕ Add Task" %>
+      </button>
+      <% if (editing) { %>
+        <a href="/" style="margin-left: 10px;">Cancel</a>
+      <% } %>
+    </form>
+  <% } else { %>
+    <p>Please <a href="/login">login</a> to add or edit tasks.</p>
+  <% } %>
+
+  <ul>
+    <% todos.forEach(element => { %>
+      <li>
+        <%= element.tasks %>
+        <% if (user) { %>
+          <div class="actions">
+            <a href="/<%= element.id %>">✏️ Edit</a>
+            <a href="/data/delete/<%= element.id %>">❌ Delete</a>
+          </div>
+        <% } %>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>

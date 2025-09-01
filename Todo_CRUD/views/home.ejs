@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task List</title>
+  <style>
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: space-between;
+    }
+    .actions a {
+      margin-left: 10px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 Task List</h1>
+
+  <!-- 🛠️ Task form: Add or Edit -->
+  <form method="POST" action="<%= editing ? '/data/' + editing.id : '/data' %>">
+    <input type="text" name="todo" placeholder="Enter task..." 
+      value="<%= editing ? editing.tasks : '' %>" required />
+    <button type="submit">
+      <%= editing ? "✏️ Update Task" : "➕ Add Task" %>
+    </button>
+    <% if (editing) { %>
+      <a href="/" style="margin-left: 10px;">Cancel</a>
+    <% } %>
+  </form>
+
+  <ul>
+    <% todos.forEach(element => { %>
+      <li>
+        <%= element.tasks %>
+        <div class="actions">
+          <a href="/<%= element.id %>">✏️ Edit</a>
+          <a href="/data/delete/<%= element.id %>">❌ Delete</a>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>

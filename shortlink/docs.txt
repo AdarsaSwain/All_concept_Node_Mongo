@@ -1,0 +1,219 @@
+//Build a nodejs app
+
+>>Just Create a folder and do (npm init) to install the pacjages
+//What are the thing must follow-up while Creating a Node Js project(Prerequistic) 
+npm install express
+npm install mongoose
+npm install dotenv
+
+//Basic Structure for the Runnning of the NodeJS Server :- const express = require("express");
+const mongoose = require("mongoose");
+
+const app = express();
+const port = 3000;
+
+app.listen(()=>{
+    console.log(`App is running at at  https://locall.host/3000/${port}`);
+    
+}) 
+
+//
+Design a URL shortener service that takes in a valid URL and
+returns a shortened URL, redirecting the user to the
+previously provided URL.
+ 
+Also, keep track of total visits/clicks on the URL.
+ 
+Routes
+ 
+POST /URL - Generates a new short URL and returns the
+shortened URL in the format example.com/random-id.
+ 
+GET /:id - Redirects the user to the original URL
+ 
+GET /URL/analytics/:id - Returns the clicks for the provided
+
+
+POST /URL - Generates a new short URL and returns the
+shortened URL in the format example.com/random-id.
+
+
+//Till the connection of Mongodb
+const express = require("express");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config({path:".env"})
+const app = express();
+const port = 3000;
+
+
+//lets connect to the mongodb
+
+mongoose.connect(process.env.MONGO_URI,{
+ useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(()=>console.log("Mongodb Succesfully Connected")) .catch((e)=>console.log("Error to connect",e));
+
+
+
+
+
+//lets connect to the port
+app.listen(()=>{
+    console.log(`App is running at at  https://locall.host/3000/${port}`);
+    
+})
+
+Most common doubut Question?
+>>(process.env.MONGO_URI,{
+useNewUrlParser: true,
+useUnifiedTopology: true
+}) --> to connect to the mongo uri inside the env
+It fetches the MongoDB connection string from the .env file.
+
+Keeps the code secure and configurable.
+
+🔹 useNewUrlParser: true
+Uses the new MongoDB URL parser (instead of the old legacy parser).
+
+Fixes some connection string issues and ensures compatibility with modern MongoDB URIs.
+
+🔹 useUnifiedTopology: true
+Enables the new server discovery and monitoring engine.
+
+Helps with better handling of connection pooling, monitoring, and replica sets.
+
+//Let Create a model
+
+//lets create a schema 
+
+const mongoose = require('mongoose');
+
+//we need three thing shortId,redirectURL,visitHistory
+const new_schema = new mongoose.Schema({
+
+    shortId:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    redirectURL:{
+        type:String,
+        required:true,
+
+    },
+    //we need a timespam for this
+    visitHistory:[{timestamp:{type:Number}}],
+},
+{timestamps:true} 
+
+);
+module.exports = {
+    url
+}
+
+It Automatically Adds Two Fields to Every Document:
+Field	What it Stores
+createdAt	Date and time when the document was created
+updatedAt	Date and time when the document was last updated   
+
+example:-- {
+  "_id": "64fcdfbb6fc6f14ad2d8b451",
+  "name": "Adarsh",
+  "email": "adarsh@example.com",
+  "createdAt": "2025-07-31T13:05:21.123Z",
+  "updatedAt": "2025-07-31T13:05:21.123Z",
+  "__v": 0
+}
+
+>> Now lets begin the logic in the model to get the shortId
+//created a controoler which generate short id and push it to the model 
+//shortID:- https://www.npmjs.com/package/shortid
+const url = require("../Model/url_model")
+const shortid =  require("shortid");
+
+const shorturl = async(req,res)=>{
+
+//let declare a body that hit and return the data in that body
+   const body = req.body;
+    const newshortid = shortid();
+
+    ///lets have a check if a anyone doesnot hit the request body 
+   if(!body.url)  res.status(400).json({error : 'url is required'}) // when we add the body {} an empty json 
+    ///lets create the the data to be push to the mongo 
+
+    await url.create({
+    shortId:newshortid,
+    redirectURL:body.url,
+    visitHistory:[]
+    
+
+
+    })
+    res.json({id:shortid}) //// This sends the generated ID as response
+
+    
+}
+module.exports = {
+shorturl
+}
+//route
+
+const express =require('express');
+const router = express.Router();
+
+const {shorturl} = require("../Controller/view_controller")
+
+
+router.post("/",shorturl);
+ module.exports = router;
+ 
+ //when we do a post request it will give the 
+ 
+ It return the data 
+ {
+    "id": "IkpqRvc2d"
+}
+
+ 
+GET /:id - Redirects the user to the original URL
+app.get("/:shortId", async (req, res) => {
+  const userclickedata = req.params.shortId;
+
+  const entry = await URL.findOneAndUpdate(
+    { shortId: userclickedata },
+    {
+      $push: {
+        visitHistory: {
+          timestamp: Date.now()
+        }
+      }
+    },
+    { new: true }
+  );
+
+  
+
+  res.redirect(entry.redirectURL);
+});
+
+//Get the count through id
+const countanalytics = async(req,res)=>{
+    const shortid = req.params.shortId;
+    //let get the response updated with count
+    const result = await URL.findOne({shortid});
+    return res.json({
+        totalclicks:result.visitHistory.length,
+        analytics:result.visitHistory
+    })
+
+}
+module.exports = {
+shorturl,
+countanalytics
+}
+router.get("/analytics/:Id",countanalytics);
+
+
+
+
